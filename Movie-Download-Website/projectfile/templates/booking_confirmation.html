@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Booking Confirmed</h2>
+<p><strong>Movie:</strong> {{ booking['ShowName'] }}</p>
+<p><strong>Theater:</strong> {{ booking['theater'] }}</p>
+<p><strong>Time:</strong> {{ booking['time'] }}</p>
+<p><strong>Seats:</strong> {{ booking['seats'] }}</p>
+{% endblock %}

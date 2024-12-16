@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="show-details-container">
+    <div class="show-details">
+        <h1>{{ show_data[0] }}</h1>
+        <p><strong>Type:</strong> {{ show_data[5] }}</p>
+        <p><strong>Release Date:</strong> {{ show_data[1] }}</p>
+        <p><strong>Genre:</strong> {{ show_data[2] }}</p>
+        <p><strong>Rating:</strong> {{ show_data[3] }}</p>
+        <p><strong>Language:</strong> {{ show_data[4] }}</p>
+        <p><strong><a href="{{ show_data[6] }}">Watch Link</a></strong></p>
+    </div>
+
+    <div class="show-poster">
+        <img src="{{ show_data[7] }}" alt="{{ show_data[0] }} Poster">
+    </div>
+</div>
+
+<div class="screenings-container">
+    <h2>Screening Times and Theaters</h2>
+    {% if screenings %}
+        <ul>
+            {% for screening in screenings %}
+                <li><strong>{{ screening["theater"] }}</strong>: {{ screening["time"] }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No screenings available for this movie.</p>
+    {% endif %}
+</div>
+
+<div class="booking-container">
+    <h2>Book Your Tickets</h2>
+    <!-- Redirect to the booking page -->
+    <form method="GET" action="{{ url_for('booking_page', show_id=show_id) }}">
+        <button type="submit" class="btn btn-primary">Book Now</button>
+    </form>
+</div>
+
+<div class="action-buttons">
+    <form method="post" action="{{ url_for('add_to_watched', show_id=show_id) }}">
+        <button type="submit" class="btn btn-primary">Add to Watched</button>
+    </form>
+    <form method="post" action="{{ url_for('add_to_planned', show_id=show_id) }}">
+        <button type="submit" class="btn btn-primary">Add to Planned</button>
+    </form>
+</div>
+{% endblock %}

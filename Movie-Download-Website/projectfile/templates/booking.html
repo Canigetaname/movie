@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="booking-container">
+    <h1>Book Tickets for {{ show_data[0] }}</h1>
+
+    <!-- Step 1: Select Date -->
+    <h2>Select Date</h2>
+    <form method="POST" action="{{ url_for('confirm_booking', show_id=show_id) }}">
+        <label for="date">Date:</label>
+        <select id="date" name="date" required>
+            {% for date in available_dates %}
+                <option value="{{ date['date'] }}">{{ date['date'] }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Step 2: Select Screening -->
+        <h2>Select Theater and Time</h2>
+        <label for="screening">Theater and Time:</label>
+        <select id="screening" name="screening" required>
+            {% for screening in screenings %}
+                <option value="{{ screening['id'] }}">{{ screening['theater'] }} - {{ screening['time'] }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Step 3: Select Number of Seats -->
+        <h2>Number of Seats</h2>
+        <label for="seats">Seats:</label>
+        <input type="number" id="seats" name="seats" min="1" required>
+
+        <!-- Step 4: Seat Map -->
+        <h2>Select Your Seats</h2>
+        <div id="seat-map">
+            <!-- Dynamically generate seat map using JavaScript -->
+        </div>
+        <input type="hidden" id="selected-seats" name="selected_seats">
+
+        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+    </form>
+</div>
+
+<script>
+    // Example JavaScript to manage seat selection
+    const seatMap = document.getElementById('seat-map');
+    const selectedSeatsInput = document.getElementById('selected-seats');
+
+    // Mock data for seat availability
+    const seats = [
+        { id: 'A1', available: true },
+        { id: 'A2', available: false },
+        { id: 'A3', available: true },
+        // Add more seats as needed
+    ];
+
+    seats.forEach(seat => {
+        const seatElement = document.createElement('button');
+        seatElement.textContent = seat.id;
+        seatElement.disabled = !seat.available;
+        seatElement.className = seat.available ? 'seat available' : 'seat unavailable';
+
+        seatElement.addEventListener('click', () => {
+            seatElement.classList.toggle('selected');
+            updateSelectedSeats();
+        });
+
+        seatMap.appendChild(seatElement);
+    });
+
+    function updateSelectedSeats() {
+        const selectedSeats = Array.from(seatMap.querySelectorAll('.seat.selected'))
+            .map(seat => seat.textContent);
+        selectedSeatsInput.value = selectedSeats.join(',');
+    }
+</script>
+
+<style>
+    .seat {
+        margin: 5px;
+        padding: 10px;
+        cursor: pointer;
+    }
+    .seat.unavailable {
+        background-color: gray;
+        cursor: not-allowed;
+    }
+    .seat.selected {
+        background-color: green;
+        color: white;
+    }
+</style>
+{% endblock %}
