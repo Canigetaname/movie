@@ -21,8 +21,8 @@ db = pymysql.connect(
 )
 
 admin_list = [
-    ['123', 'Nafis'],
-    ['231', 'Abtahi'],
+    ['123', 'Ishmum'],
+    ['231', 'Rafid'],
     ['312', 'Dipto']
 ]
 
@@ -139,7 +139,7 @@ def admin_panel():
                 cursor.execute(sql, (new_show_id, show_name, release_date, genre, rating, language, show_type, movie_link, movie_poster))
                 db.commit()
     
-            update_user_database()  # Update the user database (not tv_shows database)
+            #update_user_database()  # Update the user database (not tv_shows database)
         if 'delete_show' in request.form:
             show_id_to_delete = int(request.form.get('delete_show'))
             if show_id_to_delete in tv_shows:
@@ -153,7 +153,7 @@ def admin_panel():
                     db.commit()
 
     
-    show_list_visible = session.get('show_list_visible', False)  # Get the session variable
+    show_list_visible = session.get('show_list_visible', True)  # Get the session variable
     return render_template('admin_panel.html', user_data=user_data, tv_shows=tv_shows, show_list_visible=show_list_visible, add_show_visible=add_show_visible)
 
 @app.route('/admin/toggle_add_show', methods=['POST'])

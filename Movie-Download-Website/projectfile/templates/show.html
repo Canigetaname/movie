@@ -25,18 +25,19 @@
                 <li><strong>{{ screening["theater"] }}</strong>: {{ screening["time"] }}</li>
             {% endfor %}
         </ul>
+        <div class="booking-container">
+            <h2>Book Your Tickets</h2>
+            <!-- Redirect to the booking page -->
+            <form method="GET" action="{{ url_for('booking_page', show_id=show_id) }}">
+                <button type="submit" class="btn btn-primary">Book Now</button>
+            </form>
+        </div>
     {% else %}
         <p>No screenings available for this movie.</p>
     {% endif %}
 </div>
 
-<div class="booking-container">
-    <h2>Book Your Tickets</h2>
-    <!-- Redirect to the booking page -->
-    <form method="GET" action="{{ url_for('booking_page', show_id=show_id) }}">
-        <button type="submit" class="btn btn-primary">Book Now</button>
-    </form>
-</div>
+
 
 <div class="action-buttons">
     <form method="post" action="{{ url_for('add_to_watched', show_id=show_id) }}">

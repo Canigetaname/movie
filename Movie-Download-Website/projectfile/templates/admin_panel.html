@@ -29,6 +29,8 @@
         <form method="POST" action="{{ url_for('toggle_add_show') }}">
             <button type="submit">Toggle Add New TV Show</button>
         </form>
+    </div>
+    <div class="toggle-buttons">
         <form method="POST" action="{{ url_for('toggle_show_list') }}">
             <button type="submit">Toggle Show List</button>
         </form>
@@ -64,6 +66,7 @@
     {% endif %}
 
     <!-- TV Show List -->
+    {% if show_list_visible %}
     <div class="table-container">
         <h3>TV Show List</h3>
         <table class="admin-table">
@@ -99,5 +102,7 @@
             </tbody>
         </table>
     </div>
+{% endif %}
+
 </div>
 {% endblock %}
