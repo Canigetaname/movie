@@ -412,8 +412,13 @@ def register():
         user_database_path = os.path.join(os.path.dirname(__file__), 'user_database.txt')
         new_data = []
         for user_id, user_data in users.items():
-            watched_str = '-'.join(user_data['watched_shows'])
-            planned_str = '-'.join(user_data['planned_shows'])
+            #watched_str = '-'.join(user_data['watched_shows'])
+            #planned_str = '-'.join(user_data['planned_shows'])
+            # Ensure watched_shows contains only strings
+            watched_str = '-'.join(str(show[1]) if isinstance(show, tuple) else str(show) for show in user_data['watched_shows'])
+            # Ensure planned_shows contains only strings
+            planned_str = '-'.join(str(show[1]) if isinstance(show, tuple) else str(show) for show in user_data['planned_shows'])
+
             user_data_str = f"{user_data['password']}:{user_data['username']}:{user_data['email']}:{user_data['country']}:{user_data['liked_category']}:{watched_str}:{planned_str}"
             new_data.append(f"{user_id}:{user_data_str}\n")
         with open(user_database_path, 'w') as file:
@@ -503,7 +508,7 @@ def cancel_booking(booking_id):
 
     return redirect(url_for('admin_bookings'))
 
-
+'''
 @app.route('/profile')
 def profile():
     if 'user_id' not in session:
@@ -514,6 +519,7 @@ def profile():
         # Fetch user data
         cursor.execute("SELECT * FROM users WHERE UserId = %s", (user_id,))
         user_data = cursor.fetchone()
+        user_data = users.get(user_id)
 
         # Fetch bookings
         cursor.execute("""
@@ -526,7 +532,49 @@ def profile():
         bookings = cursor.fetchall()
 
     return render_template('profile.html', user_data=user_data, bookings=bookings)
+'''
+@app.route('/profile')
+def profile():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        user_data = users.get(user_id)
+        if user_data:
+            with db.cursor() as cursor:
+            # Fetch user data
+                cursor.execute("SELECT * FROM users WHERE UserId = %s", (user_id,))
+                user_data = cursor.fetchone()
+                user_data = users.get(user_id)
 
+                # Fetch bookings
+                cursor.execute("""
+                    SELECT t.ShowName, s.theater, s.time, b.seats
+                    FROM bookings b
+                    JOIN screenings s ON b.screening_id = s.id
+                    JOIN tvshows t ON s.movie_id = t.ShowId
+                    WHERE b.user_id = %s
+                """, (user_id,))
+                bookings = cursor.fetchall()
+                #print(user_data['watched_shows'])
+#                user_data['watched_shows'] = [show[1] if isinstance(show, tuple) else show.split(',')[1].strip(' "') for show in user_data['watched_shows']]
+                user_data_new = []
+                count = 0
+                for i in user_data['watched_shows']:
+                    if (count%2)!=0:
+                        user_data_new.append(i)
+                    count+=1
+
+                user_data_new2 = []
+                count = 0
+                for i in user_data['planned_shows']:
+                    if (count%2)!=0:
+                        user_data_new2.append(i)
+                    count+=1
+                
+                #user_data = user_data_new
+                #print(user_data_new)
+
+                return render_template('profile.html', user_data=user_data, user_data_new=user_data_new, user_data_new2=user_data_new2, bookings=bookings)
+    return redirect(url_for('login'))
 
 
 @app.route('/logout')
