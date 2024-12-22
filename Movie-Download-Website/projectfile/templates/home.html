@@ -9,7 +9,27 @@
         <input type="text" name="query" placeholder="Search for TV shows..." class="search-input">
         <button type="submit" class="search-button">Search</button>
     </form>
-    
+
+        <!-- Recommended for You -->
+    {% if recommendations %}
+    <div class="recommended-shows" style="margin-top: 50px;">
+        <h2>Recommended for You</h2>
+        <ul class="show-list">
+            {% for show_id, show_data in recommendations.items() %}
+            <li class="show-item">
+                <a href="/show/{{ show_id }}" class="show-link">
+                    <img src="{{ show_data[7] }}" alt="{{ show_data[0] }}" class="show-image">
+                    <span class="show-title">{{ show_data[0] }}</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>    
+    {% else %}
+    <p style="margin-top: 50px;">Log in to see personalized recommendations.</p>
+    {% endif %}
+
+
     <!-- Trending TV Shows -->
     <div class="trending-shows" style="margin-top: 50px;">
         <h2>Trending TV Shows </h2 >

@@ -221,8 +221,84 @@ def home():
     top_10_show_ids = sorted(tv_shows.keys(), key=lambda show_id: float(tv_shows[show_id][3]), reverse=True)[:10]
     top_10_shows = [(show_id, tv_shows[show_id]) for show_id in top_10_show_ids]
 
-    return render_template('home.html', trending_shows=trending_shows, top_10_shows=top_10_shows)
+    # Get recommendations based on LikedCategory for logged-in users
+    recommendations = {}
+    if 'user_id' in session:
+        user_id = session['user_id']
+        with db.cursor() as cursor:
+            cursor.execute("SELECT LikedCategory FROM users WHERE UserId = %s", (user_id,))
+            liked_category = cursor.fetchone()['LikedCategory']
 
+            cursor.execute("""
+                SELECT * FROM tvshows 
+                WHERE Genre LIKE %s
+                ORDER BY Rating DESC
+                LIMIT 10
+            """, (f"%{liked_category}%",))
+            recommended_shows = cursor.fetchall()
+
+            for show in recommended_shows:
+                recommendations[show['ShowId']] = [
+                    show['ShowName'], show['ReleaseDate'], show['Genre'], 
+                    show['Rating'], show['Language'], show['ShowType'], 
+                    show['MovieLink'], show['MoviePoster']
+                ]
+
+    return render_template('home.html', 
+                           trending_shows=trending_shows, 
+                           top_10_shows=top_10_shows, 
+                           recommendations=recommendations)
+
+@app.route('/add_to_list/<int:show_id>', methods=['POST'])
+def add_to_list(show_id):
+    user_id = session.get('user_id')  # Assume the user is logged in
+    list_type = request.form.get('list_type')  # 'watched' or 'planned'
+
+    if user_id and list_type in ['watched', 'planned']:
+        with db.cursor() as cursor:
+            sql = """
+                INSERT INTO showList (user_id, show_id, list_type)
+                VALUES (%s, %s, %s)
+            """
+            cursor.execute(sql, (user_id, show_id, list_type))
+            db.commit()
+        return redirect(url_for('profile'))
+    return "Invalid Request", 400
+
+def get_user_lists(user_id):
+    with db.cursor() as cursor:
+        cursor.execute("""
+            SELECT tvshows.* 
+            FROM showList 
+            JOIN tvshows ON showList.show_id = tvshows.ShowId 
+            WHERE showList.user_id = %s AND showList.list_type = 'watched'
+        """, (user_id,))
+        watched_shows = cursor.fetchall()
+        
+        cursor.execute("""
+            SELECT tvshows.* 
+            FROM showList 
+            JOIN tvshows ON showList.show_id = tvshows.ShowId 
+            WHERE showList.user_id = %s AND showList.list_type = 'planned'
+        """, (user_id,))
+        planned_shows = cursor.fetchall()
+    
+    return watched_shows, planned_shows
+
+@app.route('/remove_from_list/<int:show_id>', methods=['POST'])
+def remove_from_list(show_id):
+    user_id = session.get('user_id')
+    list_type = request.form.get('list_type')  # 'watched' or 'planned'
+
+    if user_id and list_type in ['watched', 'planned']:
+        with db.cursor() as cursor:
+            sql = """
+                DELETE FROM showList
+                WHERE user_id = %s AND show_id = %s AND list_type = %s
+            """
+            cursor.execute(sql, (user_id, show_id, list_type))
+            db.commit()
+    return redirect(url_for('profile'))
 
 @app.route('/search', methods=['GET'])
 def search():
@@ -380,18 +456,22 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        # Generate a new user ID
         max_user_id = max(users.keys(), default=0)
         user_id = max_user_id + 1
 
+        # Collect form data
         password = request.form.get('password')
         username = request.form.get('username')
         email = request.form.get('email')
         country = request.form.get('country')
         liked_category = request.form.get('liked_category')
 
+        # Check for existing username
         if any(user_data['username'] == username for user_data in users.values()):
             return render_template('register.html', username_exists=True)
 
+        # Add new user to the in-memory dictionary
         users[user_id] = {
             'password': password,
             'username': username,
@@ -402,30 +482,18 @@ def register():
             'planned_shows': []
         }
 
-        # Update the MySQL database with the new user data
+        # Update the MySQL database with the new user
         with db.cursor() as cursor:
-            sql = "INSERT INTO users (UserId, Password, UserName, Email, Country, LikedCategory) VALUES (%s, %s, %s, %s, %s, %s)"
+            sql = """
+                INSERT INTO users (UserId, Password, UserName, Email, Country, LikedCategory)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """
             cursor.execute(sql, (user_id, password, username, email, country, liked_category))
             db.commit()
 
-        # Update the user database text file
-        user_database_path = os.path.join(os.path.dirname(__file__), 'user_database.txt')
-        new_data = []
-        for user_id, user_data in users.items():
-            #watched_str = '-'.join(user_data['watched_shows'])
-            #planned_str = '-'.join(user_data['planned_shows'])
-            # Ensure watched_shows contains only strings
-            watched_str = '-'.join(str(show[1]) if isinstance(show, tuple) else str(show) for show in user_data['watched_shows'])
-            # Ensure planned_shows contains only strings
-            planned_str = '-'.join(str(show[1]) if isinstance(show, tuple) else str(show) for show in user_data['planned_shows'])
-
-            user_data_str = f"{user_data['password']}:{user_data['username']}:{user_data['email']}:{user_data['country']}:{user_data['liked_category']}:{watched_str}:{planned_str}"
-            new_data.append(f"{user_id}:{user_data_str}\n")
-        with open(user_database_path, 'w') as file:
-            file.writelines(new_data)
-
         return redirect(url_for('login'))
 
+    # Render the registration page
     return render_template('register.html')
 
 @app.route('/admin/bookings')
@@ -457,7 +525,7 @@ def booking_page(show_id):
 
         cursor.execute("SELECT id, theater, time FROM screenings WHERE movie_id = %s", (show_id,))
         screenings = cursor.fetchall()
-
+    print("Screenings:", screenings)
     return render_template('booking.html', show_id=show_id, show_data=show_data, available_dates=available_dates, screenings=screenings)
 
 
@@ -467,7 +535,6 @@ def confirm_booking(show_id):
     date = request.form['date']
     screening_id = request.form['screening']
     seats = int(request.form['seats'])
-    selected_seats = request.form['selected_seats']
     user_id = session.get('user_id')
 
     if not user_id:
@@ -476,20 +543,22 @@ def confirm_booking(show_id):
     # Save booking to the database
     with db.cursor() as cursor:
         sql = """
-            INSERT INTO bookings (screening_id, user_id, seats)
-            VALUES (%s, %s, %s)
+            INSERT INTO bookings (screening_id, user_id, seats, payment_status)
+            VALUES (%s, %s, %s, %s)
         """
-        cursor.execute(sql, (screening_id, user_id, seats))
+        cursor.execute(sql, (screening_id, user_id, seats, 'Pending'))
         db.commit()
 
-    # Redirect to confirmation page
-    return redirect(url_for('booking_confirmation', booking_id=cursor.lastrowid))
+    booking_id = cursor.lastrowid
+    return redirect(url_for('booking_confirmation', booking_id=booking_id))
+
+
 
 @app.route('/booking_confirmation/<int:booking_id>')
 def booking_confirmation(booking_id):
     with db.cursor() as cursor:
         cursor.execute("""
-            SELECT b.id, s.theater, s.time, b.seats, t.ShowName
+            SELECT b.id, s.theater, s.time, b.seats, t.ShowName, b.payment_status
             FROM bookings b
             JOIN screenings s ON b.screening_id = s.id
             JOIN tvshows t ON s.movie_id = t.ShowId
@@ -497,16 +566,31 @@ def booking_confirmation(booking_id):
         """, (booking_id,))
         booking = cursor.fetchone()
 
+    print(booking)
+
     return render_template('booking_confirmation.html', booking=booking)
 
 
-@app.route('/admin/cancel_booking/<int:booking_id>', methods=['POST'])
+
+@app.route('/cancel_booking/<int:booking_id>', methods=['POST'])
 def cancel_booking(booking_id):
     with db.cursor() as cursor:
+        # Delete booking from the database
         cursor.execute("DELETE FROM bookings WHERE id = %s", (booking_id,))
         db.commit()
 
-    return redirect(url_for('admin_bookings'))
+    return redirect(url_for('profile'))
+
+@app.route('/make_payment/<int:booking_id>', methods=['POST'])
+def make_payment(booking_id):
+    with db.cursor() as cursor:
+        # Update payment status to 'Paid'
+        sql = "UPDATE bookings SET payment_status = 'Paid' WHERE id = %s"
+        cursor.execute(sql, (booking_id,))
+        db.commit()
+
+    return redirect(url_for('booking_confirmation', booking_id=booking_id))
+
 
 '''
 @app.route('/profile')
@@ -535,46 +619,36 @@ def profile():
 '''
 @app.route('/profile')
 def profile():
-    if 'user_id' in session:
-        user_id = session['user_id']
-        user_data = users.get(user_id)
-        if user_data:
-            with db.cursor() as cursor:
-            # Fetch user data
-                cursor.execute("SELECT * FROM users WHERE UserId = %s", (user_id,))
-                user_data = cursor.fetchone()
-                user_data = users.get(user_id)
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
-                # Fetch bookings
-                cursor.execute("""
-                    SELECT t.ShowName, s.theater, s.time, b.seats
-                    FROM bookings b
-                    JOIN screenings s ON b.screening_id = s.id
-                    JOIN tvshows t ON s.movie_id = t.ShowId
-                    WHERE b.user_id = %s
-                """, (user_id,))
-                bookings = cursor.fetchall()
-                #print(user_data['watched_shows'])
-#                user_data['watched_shows'] = [show[1] if isinstance(show, tuple) else show.split(',')[1].strip(' "') for show in user_data['watched_shows']]
-                user_data_new = []
-                count = 0
-                for i in user_data['watched_shows']:
-                    if (count%2)!=0:
-                        user_data_new.append(i)
-                    count+=1
+    user_id = session['user_id']
 
-                user_data_new2 = []
-                count = 0
-                for i in user_data['planned_shows']:
-                    if (count%2)!=0:
-                        user_data_new2.append(i)
-                    count+=1
-                
-                #user_data = user_data_new
-                #print(user_data_new)
+    # Fetch watched and planned shows
+    watched_shows, planned_shows = get_user_lists(user_id)
 
-                return render_template('profile.html', user_data=user_data, user_data_new=user_data_new, user_data_new2=user_data_new2, bookings=bookings)
-    return redirect(url_for('login'))
+    # Fetch user data
+    with db.cursor() as cursor:
+        cursor.execute("SELECT * FROM users WHERE UserId = %s", (user_id,))
+        user_data = cursor.fetchone()
+
+        # Fetch bookings
+        cursor.execute("""
+            SELECT b.id, t.ShowName, s.theater, s.time, b.seats, b.payment_status
+            FROM bookings b
+            JOIN screenings s ON b.screening_id = s.id
+            JOIN tvshows t ON s.movie_id = t.ShowId
+            WHERE b.user_id = %s
+         """, (user_id,))
+    bookings = cursor.fetchall()
+        
+    return render_template('profile.html', 
+                           user_data=user_data, 
+                           watched_shows=watched_shows, 
+                           planned_shows=planned_shows, 
+                           bookings=bookings)
+
+
 
 
 @app.route('/logout')

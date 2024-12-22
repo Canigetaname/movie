@@ -218,26 +218,38 @@ body {
     font-weight: bold;
 }
 
+/* Style all input fields (text, password, email) */
 .login-form input[type="text"], .register-form input[type="text"],
-.login-form input[type="password"], .register-form input[type="password"] {
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    transition: border-color 0.3s ease-in-out;
+.login-form input[type="password"], .register-form input[type="password"],
+.register-form input[type="email"] {
+    width: 100%; /* Full width */
+    padding: 12px; /* Comfortable padding */
+    margin-bottom: 15px; /* Space between fields */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Slightly larger text */
+    background-color: #ffffff; /* White background */
+    color: #333; /* Dark text color */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: box-shadow 0.2s, background-color 0.2s; /* Smooth transitions */
 }
 
+/* Focus state for all input fields */
 .login-form input[type="text"]:focus, .register-form input[type="text"]:focus,
-.login-form input[type="password"]:focus, .register-form input[type="password"]:focus {
-    border-color: #02171f;
+.login-form input[type="password"]:focus, .register-form input[type="password"]:focus,
+.register-form input[type="email"]:focus {
+    outline: none; /* Remove outline */
+    background-color: #f1f1f1; /* Slightly darker background on focus */
+    box-shadow: 0 0 5px #007bff; /* Add blue glow on focus */
 }
 
 .login-form input[type="submit"], .register-form input[type="submit"] {
     background-color: #02171f;
     color: #fff;
     border: none;
-    padding: 10px;
+    padding: 12px;
     border-radius: 5px;
+    font-size: 16px;
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.3s ease-in-out;
@@ -246,6 +258,7 @@ body {
 .login-form input[type="submit"]:hover, .register-form input[type="submit"]:hover {
     background-color: #053640;
 }
+
 .show-list {
     display: flex;
     gap: 30px;
@@ -644,7 +657,7 @@ body {
   }
   
   .action-buttons form button {
-    background-color: #6c63ff;
+    background-color: #16bf48;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -1053,4 +1066,621 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+/* Booking Page Styling */
+.booking-container {
+    max-width: 800px;
+    margin: 50px auto;
+    background-color: #1e1e2f;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    color: #fff;
+}
+
+.title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.booking-form .form-section {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #2e2e3f;
+    color: #fff;
+    outline: none;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.form-input:focus {
+    border: 1px solid #007bff;
+    box-shadow: 0 0 6px rgba(0, 123, 255, 0.5);
+}
+
+.btn-primary {
+    width: 100%;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    transform: scale(1.02);
+}
+
+.seat-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.seat {
+    background-color: #2e2e3f;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.seat:hover {
+    background-color: #007bff;
+}
+
+.seat.selected {
+    background-color: #28a745;
+}
+
+.seat.unavailable {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Movie Details Section */
+.movie-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: #1e1e2e;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.movie-info {
+    max-width: 60%;
+}
+
+.movie-info h1 {
+    color: #ffcc00;
+}
+
+.movie-info p {
+    margin: 5px 0;
+}
+
+.watch-link {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.watch-link:hover {
+    text-decoration: underline;
+}
+
+.movie-poster .poster-img {
+    max-width: 200px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Screenings Section */
+.screenings-section {
+    background-color: #1e1e2e;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+
+.screenings-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.screenings-table th, .screenings-table td {
+    border: 1px solid #444;
+    padding: 10px;
+    text-align: left;
+}
+
+.screenings-table th {
+    background-color: #333;
+    color: #ffcc00;
+}
+
+.screenings-table tr:nth-child(even) {
+    background-color: #1e1e2e;
+}
+
+.screenings-table tr:hover {
+    background-color: #333;
+}
+
+/* Booking Section */
+.booking-container {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #1e1e2e;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.booking-container .btn {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.booking-container .btn:hover {
+    background-color: #217dbb;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.action-buttons .btn {
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.action-buttons .btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.action-buttons .btn-success:hover {
+    background-color: #218838;
+}
+
+.action-buttons .btn-warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.action-buttons .btn-warning:hover {
+    background-color: #e0a800;
+}
+/* General Page Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #10141e;
+    color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2 {
+    color: #ffcc00;
+}
+
+/* Page Container */
+.show-page-container {
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Movie Details Section */
+.movie-details-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    background-color: #1f2739;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.movie-details {
+    flex: 1;
+}
+
+.movie-title {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.movie-details p {
+    margin: 5px 0;
+    line-height: 1.6;
+}
+
+.watch-link {
+    color: #4ba0f2;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+.watch-link:hover {
+    text-decoration: underline;
+}
+
+.movie-poster img {
+    max-width: 300px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Screening Times Section */
+.screenings-container {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #1f2739;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.screenings-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.screenings-table th, .screenings-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #333;
+}
+
+.screenings-table th {
+    background-color: #2a3548;
+    color: #ffcc00;
+}
+
+.screenings-table tr:nth-child(even) {
+    background-color: #252e40;
+}
+
+.screenings-table tr:hover {
+    background-color: #333;
+}
+
+.no-screenings {
+    font-style: italic;
+    color: #aaa;
+}
+
+/* Booking Section */
+.booking-container {
+    text-align: center;
+    padding: 20px;
+    background-color: #1f2739;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.booking-container .btn {
+    background-color: #4ba0f2;
+    color: #ffffff;
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.booking-container .btn:hover {
+    background-color: #357acb;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.action-buttons .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.action-buttons .btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.action-buttons .btn-success:hover {
+    background-color: #218838;
+}
+
+.action-buttons .btn-warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.action-buttons .btn-warning:hover {
+    background-color: #e0a800;
+}
+/* Movie Details Section */
+.movie-details-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    background-color: #1f2739;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.movie-details {
+    flex: 1;
+    max-width: 60%;
+}
+
+.movie-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ffcc00;
+    margin-bottom: 10px;
+}
+
+.movie-info {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.movie-info li {
+    margin-bottom: 5px;
+}
+
+.watch-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 1.2rem;
+    color: #4ba0f2;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.watch-link:hover {
+    text-decoration: underline;
+    color: #217dbb;
+}
+
+.movie-poster img {
+    max-width: 300px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+/* Booking Confirmation Section */
+.booking-confirmation {
+    background-color: #1f2739;
+    color: #f5f5f5;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 80%;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.confirmation-title {
+    font-size: 2rem;
+    color: #ffcc00;
+    margin-bottom: 20px;
+}
+
+.confirmation-details {
+    text-align: left;
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+.confirmation-details p {
+    margin: 5px 0;
+    font-size: 1rem;
+}
+
+.confirmation-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.confirmation-actions .btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.confirmation-actions .btn-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.confirmation-actions .btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.confirmation-actions .btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.confirmation-actions .btn-primary:hover {
+    background-color: #2980b9;
+}
+.btn-danger {
+    background-color: #ff4d4d; /* Red background */
+    color: #fff; /* White text */
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Text size */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer on hover */
+    font-weight: bold; /* Bold text */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Add shadow */
+}
+
+.btn-danger:hover {
+    background-color: #cc0000; /* Darker red on hover */
+    transform: scale(1.05); /* Slight scale effect */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.5); /* Enhanced shadow */
+}
+.action-buttons {
+    display: flex;
+    justify-content: center; /* Center-align buttons horizontally */
+    gap: 10px; /* Space between buttons */
+    margin-top: 10px;
+}
+
+.action-buttons form {
+    margin: 0;
+}
+.btn-danger {
+    background-color: #ff4d4d; /* Red background */
+    color: #fff; /* White text */
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-danger:hover {
+    background-color: #cc0000; /* Darker red on hover */
+    transform: scale(1.05); /* Slight scale effect */
+}
+
+.btn-primary {
+    background-color: #28a745; /* Green background */
+    color: #fff; /* White text */
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: scale(1.05); /* Slight scale effect */
+}
+.btn-danger {
+    background-color: #ff4d4d; /* Red background */
+    color: #fff; /* White text */
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-danger:hover {
+    background-color: #cc0000; /* Darker red on hover */
+    transform: scale(1.05);
+}
+
+.btn-primary {
+    background-color: #28a745; /* Green background */
+    color: #fff; /* White text */
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: scale(1.05);
+}
+#can{
+    background-color: red;
 }

@@ -1,50 +1,68 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="show-details-container">
-    <div class="show-details">
-        <h1>{{ show_data[0] }}</h1>
-        <p><strong>Type:</strong> {{ show_data[5] }}</p>
-        <p><strong>Release Date:</strong> {{ show_data[1] }}</p>
-        <p><strong>Genre:</strong> {{ show_data[2] }}</p>
-        <p><strong>Rating:</strong> {{ show_data[3] }}</p>
-        <p><strong>Language:</strong> {{ show_data[4] }}</p>
-        <p><strong><a href="{{ show_data[6] }}">Watch Link</a></strong></p>
+<div class="show-page-container">
+    <!-- Movie Details Section -->
+    <div class="movie-details-container">
+        <div class="movie-details">
+            <h1 class="movie-title">{{ show_data[0] }}</h1>
+            <ul class="movie-info">
+                <li><strong>Type:</strong> {{ show_data[5] }}</li>
+                <li><strong>Release Date:</strong> {{ show_data[1] }}</li>
+                <li><strong>Genre:</strong> {{ show_data[2] }}</li>
+                <li><strong>Rating:</strong> {{ show_data[3] }}</li>
+                <li><strong>Language:</strong> {{ show_data[4] }}</li>
+            </ul>
+            <a href="{{ show_data[6] }}" target="_blank" class="watch-link">Watch Link</a>
+        </div>
+        <div class="movie-poster">
+            <img src="{{ show_data[7] }}" alt="{{ show_data[0] }} Poster">
+        </div>
     </div>
+    
 
-    <div class="show-poster">
-        <img src="{{ show_data[7] }}" alt="{{ show_data[0] }} Poster">
-    </div>
-</div>
-
-<div class="screenings-container">
-    <h2>Screening Times and Theaters</h2>
-    {% if screenings %}
-        <ul>
-            {% for screening in screenings %}
-                <li><strong>{{ screening["theater"] }}</strong>: {{ screening["time"] }}</li>
-            {% endfor %}
-        </ul>
+    <!-- Screening Times Section -->
+    <div class="screenings-container">
+        <h2 class="section-title">Screening Times and Theaters</h2>
+        {% if screenings %}
+        <table class="screenings-table">
+            <thead>
+                <tr>
+                    <th>Theater</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for screening in screenings %}
+                <tr>
+                    <td>{{ screening["theater"] }}</td>
+                    <td>{{ screening["time"].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Booking Section -->
         <div class="booking-container">
-            <h2>Book Your Tickets</h2>
-            <!-- Redirect to the booking page -->
+            <h2 class="section-title">Book Your Tickets</h2>
             <form method="GET" action="{{ url_for('booking_page', show_id=show_id) }}">
                 <button type="submit" class="btn btn-primary">Book Now</button>
             </form>
         </div>
-    {% else %}
-        <p>No screenings available for this movie.</p>
-    {% endif %}
-</div>
+        {% else %}
+        <p class="no-screenings">No screenings available for this movie.</p>
+        {% endif %}
+    </div>
 
-
-
-<div class="action-buttons">
-    <form method="post" action="{{ url_for('add_to_watched', show_id=show_id) }}">
-        <button type="submit" class="btn btn-primary">Add to Watched</button>
-    </form>
-    <form method="post" action="{{ url_for('add_to_planned', show_id=show_id) }}">
-        <button type="submit" class="btn btn-primary">Add to Planned</button>
-    </form>
+    <!-- Action Buttons Section -->
+    <div class="action-buttons">
+        <form method="POST" action="{{ url_for('add_to_list', show_id=show_id) }}">
+            <input type="hidden" name="list_type" value="watched">
+            <button type="submit" class="btn btn-primary">Add to Watched</button>
+        </form>
+        <form method="POST" action="{{ url_for('add_to_list', show_id=show_id) }}">
+            <input type="hidden" name="list_type" value="planned">
+            <button type="submit" class="btn btn-primary">Add to Planned</button>
+        </form>
+    </div>
 </div>
 {% endblock %}
