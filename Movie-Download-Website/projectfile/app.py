@@ -262,8 +262,12 @@ def add_to_list(show_id):
             """
             cursor.execute(sql, (user_id, show_id, list_type))
             db.commit()
+
+            if list_type == 'watched':
+                update_user_discounts(user_id)
+            
         return redirect(url_for('profile'))
-    return "Invalid Request", 400
+    return "Invalid Request, Please Log in to add to list", 400
 
 def get_user_lists(user_id):
     with db.cursor() as cursor:
@@ -387,12 +391,22 @@ def show(show_id):
     if not show_data:
         return render_template('show_not_found.html')
 
-    # Fetch screenings for this movie
     with db.cursor() as cursor:
         cursor.execute("SELECT id, theater, time FROM screenings WHERE movie_id = %s", (show_id,))
         screenings = cursor.fetchall()
 
-    return render_template('show.html', show_id=show_id, show_data=show_data, screenings=screenings)
+    # Convert YouTube watch link to embed link
+    trailer_url = show_data[6]
+    if "watch?v=" in trailer_url:
+        trailer_url = trailer_url.replace("watch?v=", "embed/")
+
+    return render_template(
+        'show.html',
+        show_id=show_id,
+        show_data=show_data,
+        screenings=screenings,
+        trailer_url=trailer_url
+    )
 
 
 @app.route('/add_to_watched/<int:show_id>', methods=['POST'])
@@ -520,13 +534,17 @@ def booking_page(show_id):
     
     # Fetch available dates and screenings
     with db.cursor() as cursor:
-        cursor.execute("SELECT DISTINCT DATE(time) as date FROM screenings WHERE movie_id = %s", (show_id,))
-        available_dates = cursor.fetchall()
-
-        cursor.execute("SELECT id, theater, time FROM screenings WHERE movie_id = %s", (show_id,))
+        cursor.execute("""
+            SELECT id, theater, time, ticket_price 
+            FROM screenings 
+            WHERE movie_id = %s
+        """, (show_id,))
         screenings = cursor.fetchall()
-    print("Screenings:", screenings)
-    return render_template('booking.html', show_id=show_id, show_data=show_data, available_dates=available_dates, screenings=screenings)
+
+    return render_template('booking.html', 
+                           show_id=show_id, 
+                           show_data=show_data, 
+                           screenings=screenings)
 
 
 @app.route('/confirm_booking/<int:show_id>', methods=['POST'])
@@ -542,11 +560,32 @@ def confirm_booking(show_id):
 
     # Save booking to the database
     with db.cursor() as cursor:
+        # Fetch ticket price for the screening
+        cursor.execute("SELECT ticket_price FROM screenings WHERE id = %s", (screening_id,))
+        ticket_price = cursor.fetchone()['ticket_price']
+
+        # Fetch the most recent discount for the user
+        cursor.execute("""
+            SELECT discount_rate 
+            FROM discounts 
+            WHERE user_id = %s 
+            ORDER BY id DESC 
+            LIMIT 1
+        """, (user_id,))
+        discount = cursor.fetchone()
+
+        # Safely assign the discount rate
+        discount_rate = discount['discount_rate'] if discount else 0
+
+        # Calculate the total cost
+        total_cost = (ticket_price * seats) * (1 - discount_rate / 100)
+
+        # Save booking
         sql = """
-            INSERT INTO bookings (screening_id, user_id, seats, payment_status)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO bookings (screening_id, user_id, seats, payment_status, total_cost)
+            VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(sql, (screening_id, user_id, seats, 'Pending'))
+        cursor.execute(sql, (screening_id, user_id, seats, 'Pending', total_cost))
         db.commit()
 
     booking_id = cursor.lastrowid
@@ -558,7 +597,7 @@ def confirm_booking(show_id):
 def booking_confirmation(booking_id):
     with db.cursor() as cursor:
         cursor.execute("""
-            SELECT b.id, s.theater, s.time, b.seats, t.ShowName, b.payment_status
+            SELECT b.id, s.theater, s.time, b.seats, t.ShowName, b.payment_status, b.total_cost
             FROM bookings b
             JOIN screenings s ON b.screening_id = s.id
             JOIN tvshows t ON s.movie_id = t.ShowId
@@ -566,10 +605,27 @@ def booking_confirmation(booking_id):
         """, (booking_id,))
         booking = cursor.fetchone()
 
-    print(booking)
-
     return render_template('booking_confirmation.html', booking=booking)
 
+def update_user_discounts(user_id):
+    with db.cursor() as cursor:
+        cursor.execute("""
+            SELECT COUNT(*) AS watched_count 
+            FROM showList 
+            WHERE user_id = %s AND list_type = 'watched'
+        """, (user_id,))
+        watched_count = cursor.fetchone()['watched_count']
+
+        # Calculate discount based on watched shows
+        discount_rate = min(20, watched_count * 2)  # Example: 2% per show, max 20%
+
+        # Update or insert discount
+        cursor.execute("""
+            INSERT INTO discounts (user_id, discount_rate)
+            VALUES (%s, %s)
+            ON DUPLICATE KEY UPDATE discount_rate = %s
+        """, (user_id, discount_rate, discount_rate))
+        db.commit()
 
 
 @app.route('/cancel_booking/<int:booking_id>', methods=['POST'])
@@ -634,13 +690,13 @@ def profile():
 
         # Fetch bookings
         cursor.execute("""
-            SELECT b.id, t.ShowName, s.theater, s.time, b.seats, b.payment_status
+            SELECT b.id, t.ShowName, s.theater, s.time, b.seats, b.payment_status, b.total_cost
             FROM bookings b
             JOIN screenings s ON b.screening_id = s.id
             JOIN tvshows t ON s.movie_id = t.ShowId
             WHERE b.user_id = %s
-         """, (user_id,))
-    bookings = cursor.fetchall()
+        """, (user_id,))
+        bookings = cursor.fetchall()
         
     return render_template('profile.html', 
                            user_data=user_data, 

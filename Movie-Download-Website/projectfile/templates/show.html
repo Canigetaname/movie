@@ -13,13 +13,26 @@
                 <li><strong>Rating:</strong> {{ show_data[3] }}</li>
                 <li><strong>Language:</strong> {{ show_data[4] }}</li>
             </ul>
-            <a href="{{ show_data[6] }}" target="_blank" class="watch-link">Watch Link</a>
+        
         </div>
         <div class="movie-poster">
             <img src="{{ show_data[7] }}" alt="{{ show_data[0] }} Poster">
         </div>
     </div>
-    
+
+    <!-- Trailer Section -->
+    <div class="trailer-container">
+        <h2 class="section-title">Watch Trailer</h2>
+        <div class="trailer-wrapper">
+            <iframe
+                src="{{ trailer_url }}"
+                title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
 
     <!-- Screening Times Section -->
     <div class="screenings-container">
@@ -41,7 +54,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <!-- Booking Section -->
+         <!-- Booking Section -->
         <div class="booking-container">
             <h2 class="section-title">Book Your Tickets</h2>
             <form method="GET" action="{{ url_for('booking_page', show_id=show_id) }}">

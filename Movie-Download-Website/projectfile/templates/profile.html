@@ -15,7 +15,7 @@
                 {{ show['ShowName'] }} ({{ show['ReleaseDate'] }})
                 <form method="POST" action="{{ url_for('remove_from_list', show_id=show['ShowId']) }}">
                     <input type="hidden" name="list_type" value="watched">
-                    <button type="submit">Remove</button>
+                    <button class="btn btn-danger" type="submit">Remove</button>
                 </form>
             </li>
             {% endfor %}
@@ -32,7 +32,7 @@
                 {{ show['ShowName'] }} ({{ show['ReleaseDate'] }})
                 <form method="POST" action="{{ url_for('remove_from_list', show_id=show['ShowId']) }}">
                     <input type="hidden" name="list_type" value="planned">
-                    <button type="submit">Remove</button>
+                    <button class="btn btn-danger" type="submit">Remove</button>
                 </form>
             </li>
             {% endfor %}
@@ -51,6 +51,7 @@
                 <strong>Theater:</strong> {{ booking['theater'] }} <br>
                 <strong>Time:</strong> {{ booking['time'] }} <br>
                 <strong>Seats:</strong> {{ booking['seats'] }} <br>
+                <strong>Total Cost:</strong> {{ booking['total_cost'] }} <br>
                 <strong>Payment Status:</strong> {{ booking['payment_status'] }}
                 
                 <div class="action-buttons">
