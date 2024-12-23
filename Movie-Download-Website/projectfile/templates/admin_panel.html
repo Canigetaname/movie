@@ -15,10 +15,12 @@
         <p><strong>Watched Shows:</strong> {{ user_data.watched_shows }}</p>
         <p><strong>Planned Shows:</strong> {{ user_data.planned_shows }}</p>
       </div>
+    {% else %}
+      <p>No user information available. Please search for a user.</p>
     {% endif %}
 
     <!-- User Search Form -->
-    <form method="POST">
+    <form method="POST" class="user-search-form">
         <label for="user_identifier">Search for User by UserID:</label>
         <input type="text" id="user_identifier" name="user_identifier" placeholder="Enter User ID">
         <button type="submit">Search</button>
@@ -102,7 +104,41 @@
             </tbody>
         </table>
     </div>
-{% endif %}
+    {% endif %}
 
+    <!-- Ticket Sales Report -->
+    <div class="admin-report">
+        <h3>Reports</h3>
+        <ul>
+            <li><a href="{{ url_for('admin_report') }}" class="btn btn-primary">View Ticket Sales Report</a></li>
+        </ul>
+    </div>
+
+    <!-- Display Ticket Sales Report -->
+    {% if report_data %}
+    <div class="table-container">
+        <h3>Ticket Sales Report</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Show Name</th>
+                    <th>Theater</th>
+                    <th>Tickets Sold</th>
+                    <th>Total Seats</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in report_data %}
+                <tr>
+                    <td>{{ report['ShowName'] }}</td>
+                    <td>{{ report['theater'] }}</td>
+                    <td>{{ report['tickets_sold'] }}</td>
+                    <td>{{ report['total_seats'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

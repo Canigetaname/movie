@@ -1923,3 +1923,156 @@ select {
     border-radius: 5px; /* Same border radius as the input fields */
     box-sizing: border-box; /* Ensure consistent sizing */
 }
+
+.admin-report {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #1a1a2e;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+.admin-report {
+    margin-top: 20px;
+}
+
+.admin-report h3 {
+    color: #e94560;
+    margin-bottom: 10px;
+}
+
+.admin-report ul {
+    list-style: none;
+    padding: 0;
+}
+
+.admin-report ul li {
+    margin: 5px 0;
+}
+
+.admin-report ul li a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.admin-report ul li a:hover {
+    text-decoration: underline;
+}
+
+.table-container {
+    margin-top: 20px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.admin-table th, .admin-table td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.admin-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+.admin-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.admin-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+
+
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #212529; /* Dark background */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    color: #f8f9fa;
+}
+
+/* Page Title */
+h1 {
+    color: #f8f9fa;
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 30px;
+}
+
+/* Table Styling */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+}
+
+.table th {
+    background-color: #343a40;
+    color: #fff;
+    font-size: 16px;
+    text-transform: uppercase;
+    padding: 12px;
+}
+
+.table td {
+    padding: 10px;
+    font-size: 14px;
+    color: #212529;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #d6d8db;
+    transition: background-color 0.3s ease;
+}
+
+/* Alert Box Styling */
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.alert-info {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+/* Shadow and Border Enhancements */
+.shadow {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.rounded {
+    border-radius: 8px;
+}
+
+/* Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.mt-5 {
+    margin-top: 50px;
+}
+
+.mb-4 {
+    margin-bottom: 40px;
+}

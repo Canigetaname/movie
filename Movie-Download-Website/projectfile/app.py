@@ -88,21 +88,22 @@ def admin():
         for admin_info in admin_list:
             if admin_info[1] == admin_name and admin_info[0] == admin_password:
                 authenticated = True
+                session['admin_authenticated'] = True  # Set session flag
                 break
 
         if not authenticated:
             authentication_failed = True
-    
-        # Check if user identifier is provided and search for user
+
+    #Check if user identifier is provided and search for user
         user_identifier = request.form.get('user_identifier')
         if user_identifier:
             user_data = search_user(user_identifier)
+            session['user_data'] = user_data  # Store user_data in session
 
     if authenticated:
-        return redirect(url_for('admin_panel', user_data=user_data))
+        return redirect(url_for('admin_panel'))
     else:
-        return render_template('admin.html', authentication_failed=authentication_failed, user_data=user_data)
-
+        return render_template('admin.html', authentication_failed=authentication_failed)
 
 
 @app.route('/admin/panel', methods=['GET', 'POST'])
@@ -135,11 +136,14 @@ def admin_panel():
             
             # Update the TV shows database (MySQL table)
             with db.cursor() as cursor:
-                sql = "INSERT INTO tvshows (ShowId, ShowName, ReleaseDate, Genre, Rating, Language, ShowType, MovieLink, MoviePoster) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                sql = """
+                INSERT INTO tvshows (ShowId, ShowName, ReleaseDate, Genre, Rating, Language, ShowType, MovieLink, MoviePoster) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
                 cursor.execute(sql, (new_show_id, show_name, release_date, genre, rating, language, show_type, movie_link, movie_poster))
                 db.commit()
     
-            #update_user_database()  # Update the user database (not tv_shows database)
+        # Check if the form is for deleting a TV show
         if 'delete_show' in request.form:
             show_id_to_delete = int(request.form.get('delete_show'))
             if show_id_to_delete in tv_shows:
@@ -152,9 +156,29 @@ def admin_panel():
                     cursor.execute(sql, (show_id_to_delete,))
                     db.commit()
 
-    
     show_list_visible = session.get('show_list_visible', True)  # Get the session variable
-    return render_template('admin_panel.html', user_data=user_data, tv_shows=tv_shows, show_list_visible=show_list_visible, add_show_visible=add_show_visible)
+
+    # Check if the ticket sales report should be displayed
+    report_data = None
+    if 'view_report' in request.form:
+        with db.cursor() as cursor:
+            cursor.execute("""
+                SELECT t.ShowName, s.theater, COUNT(b.id) AS tickets_sold, SUM(b.seats) AS total_seats
+                FROM bookings b
+                JOIN screenings s ON b.screening_id = s.id
+                JOIN tvshows t ON s.movie_id = t.ShowId
+                GROUP BY t.ShowName, s.theater
+            """)
+            report_data = cursor.fetchall()
+
+    return render_template(
+        'admin_panel.html',
+        user_data=user_data,
+        tv_shows=tv_shows,
+        show_list_visible=show_list_visible,
+        add_show_visible=add_show_visible,
+        report_data=report_data  # Pass the report data to the template
+    )
 
 @app.route('/admin/toggle_add_show', methods=['POST'])
 def toggle_add_show():
@@ -509,6 +533,27 @@ def register():
 
     # Render the registration page
     return render_template('register.html')
+
+@app.route('/admin/report')
+def admin_report():
+    # Assuming you use a session variable to check admin authentication
+    if 'admin_authenticated' not in session or not session['admin_authenticated']:
+        return redirect(url_for('admin'))  # Redirect to admin login page
+
+    # Fetch ticket sales data
+    with db.cursor() as cursor:
+        cursor.execute("""
+            SELECT t.ShowName, s.theater, COUNT(b.id) AS tickets_sold, 
+                   SUM(b.seats) AS total_seats
+            FROM bookings b
+            JOIN screenings s ON b.screening_id = s.id
+            JOIN tvshows t ON s.movie_id = t.ShowId
+            GROUP BY t.ShowName, s.theater
+        """)
+        report_data = cursor.fetchall()
+
+    # Render the admin report page
+    return render_template('admin_report.html', report_data=report_data)
 
 @app.route('/admin/bookings')
 def admin_bookings():
