@@ -623,7 +623,7 @@ def confirm_booking(show_id):
         discount_rate = discount['discount_rate'] if discount else 0
 
         # Calculate the total cost
-        total_cost = (ticket_price * seats) * (1 - discount_rate / 100)
+        total_cost = (float(ticket_price * seats)) * float((1 - discount_rate / 100))
 
         # Save booking
         sql = """
