@@ -757,8 +757,8 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('home'))
 
-
-app.run(debug=True)
+if __name__=="main":
+    app.run(debug=False, host="0.0.0.0")
 
 
 
